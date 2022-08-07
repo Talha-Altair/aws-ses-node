@@ -1,6 +1,6 @@
-var aws     = require('aws-sdk');
+var aws = require('aws-sdk');
 
-var email   = "altairtalha@gmail.com";
+var email = "altairtalha@gmail.com";
 
 aws.config.loadFromPath(__dirname + '/config.json');
 var ses = new aws.SES();
@@ -9,29 +9,36 @@ sender_text = 'talhaaaa'
 subject = 'subjekt'
 body = 'wassupp'
 
-var ses_mail = "From: " + sender_text + "<" + email + ">\n";
-ses_mail += "To: " + email + "\n";
-ses_mail += "Subject:"+ subject + "\n";
-ses_mail += "MIME-Version: 1.0\n";
-ses_mail += "Content-Type: multipart/mixed; boundary=\"NextPart\"\n\n";
-ses_mail += "--NextPart\n";
-ses_mail += "Content-Type: text/html; charset=us-ascii\n\n";
-ses_mail += body + "\n\n";
-ses_mail += "--NextPart\n";
-ses_mail += "Content-Type: text/plain;\n";
-ses_mail += "--NextPart--";
 
 var params = {
-    RawMessage: { Data: new Buffer(ses_mail) },
-    Destinations: [ email ],
-    Source: "<" + email + ">'"
+  Destination: {
+    BccAddresses: [
+    ],
+    CcAddresses: [
+    ],
+    ToAddresses: [
+      email,
+    ]
+  },
+  Message: {
+    Body: {
+      Html: {
+        Charset: "UTF-8",
+        Data: "This message body contains HTML formatting. It can, for example, contain links like this one: <a class=\"ulink\" href=\"http://docs.aws.amazon.com/ses/latest/DeveloperGuide\" target=\"_blank\">Amazon SES Developer Guide</a>."
+      },
+      Text: {
+        Charset: "UTF-8",
+        Data: "This is the message body in text format."
+      }
+    },
+    Subject: {
+      Charset: "UTF-8",
+      Data: "Test email"
+    }
+  },
+  Source: email,
 };
-
-ses.sendRawEmail(params, function(err, data) {
-    if(err) {
-        console.log(err);
-    } 
-    else {
-        console.log(data);
-    }           
+ses.sendEmail(params, function (err, data) {
+  if (err) console.log(err, err.stack); // an error occurred
+  else console.log(data);           // successful response
 });
